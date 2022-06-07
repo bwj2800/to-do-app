@@ -23,10 +23,13 @@ const authLink = setContext((_, { headers }) => {
 
 
 export default function Home(todos) {
-  
-  console.log(todos.todos[0].text);
   const [userInput, setUserInput]=useState('')
   const [todoList, setTodoList]=useState([])
+
+  for (var i =0; i<todos.todos.length;i++){
+    todoList[i]=todos.todos[i].text
+  }
+  console.log(todos.todos);
 
   const handleChange=(e)=>{
     e.preventDefault()
@@ -56,6 +59,16 @@ export default function Home(todos) {
 
   const handleDelete = (todo) =>{
     const updatedArr = todoList.filter(todoItem => todoList.indexOf(todoItem) != todoList.indexOf(todo))
+
+    client.mutate({
+      mutation: gql`
+        mutation delTodo {
+          delete_todos(where: {text: {_eq: todo}}) {
+            affected_rows
+          }
+        }
+      `
+    });
 
     setTodoList(updatedArr)
   }
